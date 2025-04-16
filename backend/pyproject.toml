@@ -18,6 +18,7 @@ python-jose = {extras = ["cryptography"], version = "^3.4.0"}
 python-multipart = "^0.0.20"
 starlette-session = "^0.4.3"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+sqlalchemy = "^2.0.29"
 
 
 [build-system]
