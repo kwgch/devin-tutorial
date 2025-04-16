@@ -4,7 +4,8 @@ from pydantic import BaseModel
 from typing import Optional
 
 from app.auth import User, UserCreate, create_access_token, Token, get_current_user
-from app.database import db
+from app.db_service import DatabaseService
+from app.db_config import get_db
 
 router = APIRouter(tags=["authentication"])
 
@@ -23,16 +24,18 @@ class UserLoginRequest(BaseModel):
     password: str
 
 @router.post("/register", response_model=Token)
-async def register(user_data: UserRegisterRequest):
+async def register(user_data: UserRegisterRequest, db = Depends(get_db)):
     """新規ユーザー登録エンドポイント"""
-    existing_user = db.get_user_by_email(user_data.email)
+    db_service = DatabaseService(db)
+    
+    existing_user = db_service.get_user_by_email(user_data.email)
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="このメールアドレスは既に登録されています。"
         )
     
-    user = db.create_user(UserCreate(
+    user = db_service.create_user(UserCreate(
         email=user_data.email,
         password=user_data.password,
         name=user_data.name
@@ -45,9 +48,11 @@ async def register(user_data: UserRegisterRequest):
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/login", response_model=Token)
-async def login(user_data: UserLoginRequest):
+async def login(user_data: UserLoginRequest, db = Depends(get_db)):
     """ユーザーログインエンドポイント"""
-    user = db.verify_user_password(user_data.email, user_data.password)
+    db_service = DatabaseService(db)
+    
+    user = db_service.verify_user_password(user_data.email, user_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
