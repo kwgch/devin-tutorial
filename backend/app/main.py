@@ -6,7 +6,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.api import router
 from app.auth_routes import router as auth_router
 
-app = FastAPI(title="Parallel Diary API", description="API for Japanese-English diary application with Google authentication")
+app = FastAPI(title="Parallel Diary API", description="API for Japanese-English diary application")
 
 # Disable CORS. Do not remove this for full-stack development.
 app.add_middleware(

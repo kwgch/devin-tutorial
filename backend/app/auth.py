@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2AuthorizationCodeBearer
+from fastapi.security import HTTPBearer
 from jose import JWTError, jwt
 from pydantic import BaseModel
 
@@ -15,10 +15,7 @@ SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secure-jwt-secret-key")  # Defaul
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 1 week
 
-oauth2_scheme = OAuth2AuthorizationCodeBearer(
-    authorizationUrl="auth/login",
-    tokenUrl="auth/token",
-)
+security = HTTPBearer()
 
 class Token(BaseModel):
     access_token: str
@@ -68,7 +65,7 @@ def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta]
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+async def get_current_user(credentials = Depends(security)) -> User:
     """Validate the token and return the current user."""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -77,9 +74,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     )
     
     try:
+        token = credentials.credentials
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("email")
-        sub: str = payload.get("sub")
+        email = payload.get("email")
+        sub = payload.get("sub")
         
         if email is None or sub is None:
             raise credentials_exception
