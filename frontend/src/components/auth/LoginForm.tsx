@@ -4,6 +4,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { useAuth } from '../../context/AuthContext';
+import { API_URL } from '../../config';
 
 interface LoginFormProps {
   onSuccess: () => void;
@@ -23,8 +24,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
     setError(null);
 
     try {
-      const apiUrl = 'http://localhost:8000';
-      const response = await fetch(`${apiUrl}/auth/login`, {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

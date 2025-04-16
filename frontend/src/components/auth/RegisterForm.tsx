@@ -4,6 +4,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { useAuth } from '../../context/AuthContext';
+import { API_URL } from '../../config';
 
 interface RegisterFormProps {
   onSuccess: () => void;
@@ -24,8 +25,7 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
     setError(null);
 
     try {
-      const apiUrl = 'http://localhost:8000';
-      const response = await fetch(`${apiUrl}/auth/register`, {
+      const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
