@@ -19,6 +19,7 @@ python-multipart = "^0.0.20"
 starlette-session = "^0.4.3"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 sqlalchemy = "^2.0.29"
+psycopg2-binary = "^2.9.10"
 
 
 [build-system]
