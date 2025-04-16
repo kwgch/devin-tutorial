@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Menu } from 'lucide-react';
 import { 
   Sheet, 
@@ -21,8 +22,20 @@ export function MobileNavigation({
   userName, 
   onLogout 
 }: MobileNavigationProps) {
+  const [open, setOpen] = useState(false);
+  
+  const handleNavigate = (view: string) => {
+    onNavigate(view);
+    setOpen(false); // Close the menu after selection
+  };
+  
+  const handleLogout = () => {
+    onLogout();
+    setOpen(false); // Close the menu after logout
+  };
+  
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="md:hidden">
           <Menu className="h-6 w-6" />
@@ -40,7 +53,7 @@ export function MobileNavigation({
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={onLogout} 
+                onClick={handleLogout} 
                 className="mt-2 w-full justify-start"
               >
                 ログアウト
@@ -51,21 +64,21 @@ export function MobileNavigation({
             <Button
               variant={currentView === 'diary' ? 'default' : 'ghost'}
               className="justify-start"
-              onClick={() => onNavigate('diary')}
+              onClick={() => handleNavigate('diary')}
             >
               日記を書く
             </Button>
             <Button
               variant={currentView === 'entries' ? 'default' : 'ghost'}
               className="justify-start"
-              onClick={() => onNavigate('entries')}
+              onClick={() => handleNavigate('entries')}
             >
               日記一覧
             </Button>
             <Button
               variant={currentView === 'favorites' ? 'default' : 'ghost'}
               className="justify-start"
-              onClick={() => onNavigate('favorites')}
+              onClick={() => handleNavigate('favorites')}
             >
               お気に入りの表現
             </Button>
