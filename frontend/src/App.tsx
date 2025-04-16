@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoginPage } from './pages/LoginPage';
-import { AuthCallback } from './pages/AuthCallback';
 import { DiaryApp } from './pages/DiaryApp';
 import './App.css';
 
@@ -27,7 +26,6 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/auth-callback" element={<AuthCallback />} />
           <Route 
             path="/" 
             element={
