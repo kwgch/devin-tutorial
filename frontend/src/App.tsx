@@ -37,7 +37,7 @@ function App() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl">
       <header className="mb-8 text-center">
-        <h1 className="text-3xl font-bold mb-2">日英バイリンガル日記</h1>
+        <h1 className="text-3xl font-bold mb-2">パラレルダイアリー</h1>
         <p className="text-gray-600">
           日本語で日記を書くと、英語に自動翻訳されます。お気に入りの表現も保存できます。
         </p>
