@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+from app.api import router
+
+app = FastAPI(title="Diary App API", description="API for Japanese-English diary application")
 
 # Disable CORS. Do not remove this for full-stack development.
 app.add_middleware(
@@ -11,6 +13,8 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
+
+app.include_router(router, prefix="/api")
 
 
 @app.get("/healthz")
