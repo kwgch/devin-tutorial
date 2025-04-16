@@ -3,14 +3,17 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 from app.models import DiaryEntry, FavoriteExpression
+from app.auth import User, UserCreate
 
 
 class InMemoryDatabase:
-    """In-memory database for diary entries."""
+    """In-memory database for diary entries and users."""
     
     def __init__(self):
         self.diary_entries: Dict[str, DiaryEntry] = {}
         self.favorite_expressions: List[FavoriteExpression] = []
+        self.users: Dict[str, User] = {}
+        self.user_entries: Dict[str, List[str]] = {}  # Maps user_id to list of entry_ids
     
     def create_diary_entry(self, content: str, translated_content: str) -> DiaryEntry:
         """Create a new diary entry."""
@@ -77,6 +80,38 @@ class InMemoryDatabase:
     def get_all_favorite_expressions(self) -> List[FavoriteExpression]:
         """Get all favorite expressions."""
         return self.favorite_expressions
+    
+    def create_user(self, user_data: UserCreate) -> User:
+        """Create a new user."""
+        user_id = str(uuid.uuid4())
+        now = datetime.now()
+        
+        user = User(
+            id=user_id,
+            email=user_data.email,
+            name=user_data.name,
+            picture=user_data.picture,
+            created_at=now
+        )
+        
+        self.users[user_id] = user
+        self.user_entries[user_id] = []
+        return user
+    
+    def get_user_by_id(self, user_id: str) -> Optional[User]:
+        """Get a user by ID."""
+        return self.users.get(user_id)
+    
+    def get_user_by_email(self, email: str) -> Optional[User]:
+        """Get a user by email."""
+        for user in self.users.values():
+            if user.email == email:
+                return user
+        return None
+        
+def get_user_by_email(email: str) -> Optional[User]:
+    """Get a user by email."""
+    return db.get_user_by_email(email)
 
 
 db = InMemoryDatabase()

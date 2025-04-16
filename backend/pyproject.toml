@@ -12,6 +12,11 @@ psycopg = {extras = ["binary"], version = "^3.2.6"}
 pydantic-settings = "^2.8.1"
 python-dotenv = "^1.1.0"
 deep-translator = "^1.11.4"
+authlib = "^1.5.2"
+itsdangerous = "^2.2.0"
+python-jose = {extras = ["cryptography"], version = "^3.4.0"}
+python-multipart = "^0.0.20"
+starlette-session = "^0.4.3"
 
 
 [build-system]
