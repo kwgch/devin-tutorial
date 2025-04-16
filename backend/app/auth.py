@@ -86,8 +86,14 @@ async def get_current_user(credentials = Depends(security)) -> User:
     except JWTError:
         raise credentials_exception
     
-    from app.database import get_user_by_email
-    user = get_user_by_email(email)
+    from app.db_service import DatabaseService
+    from app.db_config import get_db
+    from fastapi import Depends
+    
+    db = next(get_db())
+    db_service = DatabaseService(db)
+    
+    user = db_service.get_user_by_email(email)
     
     if user is None:
         raise credentials_exception
