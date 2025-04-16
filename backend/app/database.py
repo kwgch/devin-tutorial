@@ -14,6 +14,7 @@ class InMemoryDatabase:
         self.favorite_expressions: List[FavoriteExpression] = []
         self.users: Dict[str, User] = {}
         self.user_entries: Dict[str, List[str]] = {}  # Maps user_id to list of entry_ids
+        self.user_passwords: Dict[str, str] = {}  # Maps user_id to hashed password
     
     def create_diary_entry(self, content: str, translated_content: str) -> DiaryEntry:
         """Create a new diary entry."""
@@ -96,6 +97,11 @@ class InMemoryDatabase:
         
         self.users[user_id] = user
         self.user_entries[user_id] = []
+        
+        # Store hashed password
+        from app.auth import get_password_hash
+        self.user_passwords[user_id] = get_password_hash(user_data.password)
+        
         return user
     
     def get_user_by_id(self, user_id: str) -> Optional[User]:
@@ -106,6 +112,15 @@ class InMemoryDatabase:
         """Get a user by email."""
         for user in self.users.values():
             if user.email == email:
+                return user
+        return None
+        
+    def verify_user_password(self, email: str, password: str) -> Optional[User]:
+        """Verify user credentials and return user if valid."""
+        user = self.get_user_by_email(email)
+        if user and user.id in self.user_passwords:
+            from app.auth import verify_password
+            if verify_password(password, self.user_passwords[user.id]):
                 return user
         return None
         

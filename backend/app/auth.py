@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SECRET_KEY = os.getenv("JWT_SECRET_KEY")  # Must be set in environment variables
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secure-jwt-secret-key")  # Default value for development
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 1 week
 
@@ -34,7 +34,7 @@ class UserBase(BaseModel):
     picture: Optional[str] = None
 
 class UserCreate(UserBase):
-    pass
+    password: str
 
 class User(UserBase):
     id: str
@@ -42,6 +42,18 @@ class User(UserBase):
     
     class Config:
         from_attributes = True
+
+
+from passlib.context import CryptContext
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def verify_password(plain_password, hashed_password):
+    """Verify a password against a hash."""
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password):
+    """Generate a password hash."""
+    return pwd_context.hash(password)
 
 def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
     """Create a JWT access token."""
