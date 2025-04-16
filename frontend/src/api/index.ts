@@ -1,6 +1,5 @@
 import { DiaryEntry, DiaryEntryCreate, FavoriteExpression } from '../types';
-
-const API_URL = 'http://localhost:8000/api';
+import { DIARY_API_URL } from '../config/api';
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('auth_token');
@@ -11,7 +10,7 @@ const getAuthHeaders = () => {
 };
 
 export const fetchDiaryEntries = async (): Promise<DiaryEntry[]> => {
-  const response = await fetch(`${API_URL}/diary`, {
+  const response = await fetch(`${DIARY_API_URL}/diary`, {
     headers: getAuthHeaders(),
   });
   if (!response.ok) {
@@ -21,7 +20,7 @@ export const fetchDiaryEntries = async (): Promise<DiaryEntry[]> => {
 };
 
 export const fetchDiaryEntry = async (id: string): Promise<DiaryEntry> => {
-  const response = await fetch(`${API_URL}/diary/${id}`, {
+  const response = await fetch(`${DIARY_API_URL}/diary/${id}`, {
     headers: getAuthHeaders(),
   });
   if (!response.ok) {
@@ -31,7 +30,7 @@ export const fetchDiaryEntry = async (id: string): Promise<DiaryEntry> => {
 };
 
 export const createDiaryEntry = async (entry: DiaryEntryCreate): Promise<DiaryEntry> => {
-  const response = await fetch(`${API_URL}/diary`, {
+  const response = await fetch(`${DIARY_API_URL}/diary`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify(entry),
@@ -43,7 +42,7 @@ export const createDiaryEntry = async (entry: DiaryEntryCreate): Promise<DiaryEn
 };
 
 export const updateDiaryEntry = async (id: string, entry: DiaryEntryCreate): Promise<DiaryEntry> => {
-  const response = await fetch(`${API_URL}/diary/${id}`, {
+  const response = await fetch(`${DIARY_API_URL}/diary/${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),
     body: JSON.stringify(entry),
@@ -55,7 +54,7 @@ export const updateDiaryEntry = async (id: string, entry: DiaryEntryCreate): Pro
 };
 
 export const deleteDiaryEntry = async (id: string): Promise<void> => {
-  const response = await fetch(`${API_URL}/diary/${id}`, {
+  const response = await fetch(`${DIARY_API_URL}/diary/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
@@ -70,7 +69,7 @@ export const addFavoriteExpression = async (
   englishText: string,
   note?: string
 ): Promise<FavoriteExpression> => {
-  const response = await fetch(`${API_URL}/diary/${entryId}/favorite`, {
+  const response = await fetch(`${DIARY_API_URL}/diary/${entryId}/favorite`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify({
@@ -86,7 +85,7 @@ export const addFavoriteExpression = async (
 };
 
 export const fetchFavoriteExpressions = async (): Promise<FavoriteExpression[]> => {
-  const response = await fetch(`${API_URL}/favorites`, {
+  const response = await fetch(`${DIARY_API_URL}/favorites`, {
     headers: getAuthHeaders(),
   });
   if (!response.ok) {
