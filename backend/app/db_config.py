@@ -1,4 +1,5 @@
 import os
+import sys
 from typing import Generator
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -7,14 +8,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-if os.getenv("FLY_APP_NAME"):
+is_fly_deployment = os.getenv("FLY_APP_NAME") is not None
+
+if is_fly_deployment:
     DATABASE_URL = "sqlite:///:memory:"
-    print("Using in-memory SQLite database for deployment")
+    print("Using in-memory SQLite database for deployment", file=sys.stderr)
 else:
     DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost/parallel_diary")
-    print(f"Using database: {DATABASE_URL}")
+    print(f"Using database: {DATABASE_URL}", file=sys.stderr)
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {})
+connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
