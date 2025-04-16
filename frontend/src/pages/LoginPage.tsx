@@ -1,36 +1,37 @@
-import React, { useState } from 'react';
-import { GoogleLoginButton } from '../components/GoogleLoginButton';
-import { useAuth } from '../context/AuthContext';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { LoginForm } from '../components/auth/LoginForm';
+import { RegisterForm } from '../components/auth/RegisterForm';
 
 export function LoginPage() {
-  const { login } = useAuth();
-  const [error, setError] = useState<string | null>(null);
+  const [showLogin, setShowLogin] = useState(true);
+  const navigate = useNavigate();
 
-  const handleLoginSuccess = (token: string) => {
-    login(token);
+  const handleSuccess = () => {
+    navigate('/');
   };
 
-  const handleLoginError = () => {
-    setError('ログインに失敗しました。もう一度お試しください。');
+  const handleSwitchToRegister = () => {
+    setShowLogin(false);
+  };
+
+  const handleSwitchToLogin = () => {
+    setShowLogin(true);
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">パラレルダイアリー</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <GoogleLoginButton 
-            onSuccess={handleLoginSuccess} 
-            onError={handleLoginError} 
-          />
-          {error && (
-            <p className="text-red-500 text-center mt-4">{error}</p>
-          )}
-        </CardContent>
-      </Card>
+      {showLogin ? (
+        <LoginForm 
+          onSuccess={handleSuccess} 
+          onSwitchToRegister={handleSwitchToRegister} 
+        />
+      ) : (
+        <RegisterForm 
+          onSuccess={handleSuccess} 
+          onSwitchToLogin={handleSwitchToLogin} 
+        />
+      )}
     </div>
   );
 }

@@ -17,6 +17,7 @@ itsdangerous = "^2.2.0"
 python-jose = {extras = ["cryptography"], version = "^3.4.0"}
 python-multipart = "^0.0.20"
 starlette-session = "^0.4.3"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 
 
 [build-system]

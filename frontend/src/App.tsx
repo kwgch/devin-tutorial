@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoginPage } from './pages/LoginPage';
 import { AuthCallback } from './pages/AuthCallback';
@@ -22,26 +21,23 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 function App() {
-  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
   
   return (
     <BrowserRouter>
-      <GoogleOAuthProvider clientId={googleClientId}>
-        <AuthProvider>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/auth-callback" element={<AuthCallback />} />
-            <Route 
-              path="/" 
-              element={
-                <ProtectedRoute>
-                  <DiaryApp />
-                </ProtectedRoute>
-              } 
-            />
-          </Routes>
-        </AuthProvider>
-      </GoogleOAuthProvider>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/auth-callback" element={<AuthCallback />} />
+          <Route 
+            path="/" 
+            element={
+              <ProtectedRoute>
+                <DiaryApp />
+              </ProtectedRoute>
+            } 
+          />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

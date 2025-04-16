@@ -1,63 +1,65 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
-from fastapi.responses import RedirectResponse
-from authlib.integrations.starlette_client import OAuth
-from starlette.config import Config
-from starlette.middleware.sessions import SessionMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from typing import Optional
 
 from app.auth import User, UserCreate, create_access_token, Token, get_current_user
 from app.database import db
 
-router = APIRouter(prefix="/auth", tags=["authentication"])
+router = APIRouter(tags=["authentication"])
 
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-config = Config(environ={
-    "GOOGLE_CLIENT_ID": os.getenv("GOOGLE_CLIENT_ID"),
-    "GOOGLE_CLIENT_SECRET": os.getenv("GOOGLE_CLIENT_SECRET")
-})
+class UserRegisterRequest(BaseModel):
+    email: str
+    password: str
+    name: Optional[str] = None
 
-oauth = OAuth(config)
-oauth.register(
-    name="google",
-    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
-    client_kwargs={"scope": "openid email profile"},
-)
+class UserLoginRequest(BaseModel):
+    email: str
+    password: str
 
-@router.get("/login")
-async def login(request: Request):
-    """Redirect to Google OAuth login."""
-    redirect_uri = request.url_for("auth_callback")
-    return await oauth.google.authorize_redirect(request, redirect_uri)
-
-@router.get("/callback")
-async def auth_callback(request: Request):
-    """Handle OAuth callback from Google."""
-    token = await oauth.google.authorize_access_token(request)
-    user_info = await oauth.google.parse_id_token(request, token)
-    
-    email = user_info.get("email")
-    user = db.get_user_by_email(email)
-    
-    if not user:
-        user_data = UserCreate(
-            email=email,
-            name=user_info.get("name"),
-            picture=user_info.get("picture")
+@router.post("/register", response_model=Token)
+async def register(user_data: UserRegisterRequest):
+    """新規ユーザー登録エンドポイント"""
+    existing_user = db.get_user_by_email(user_data.email)
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="このメールアドレスは既に登録されています。"
         )
-        user = db.create_user(user_data)
+    
+    user = db.create_user(UserCreate(
+        email=user_data.email,
+        password=user_data.password,
+        name=user_data.name
+    ))
     
     access_token = create_access_token(
-        data={"sub": user.id, "email": user.email}
+        data={"sub": user.id, "email": user.email, "name": user.name}
     )
     
-    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173/auth-callback")
-    return RedirectResponse(
-        url=f"{frontend_url}?token={access_token}",
-        status_code=status.HTTP_303_SEE_OTHER
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@router.post("/login", response_model=Token)
+async def login(user_data: UserLoginRequest):
+    """ユーザーログインエンドポイント"""
+    user = db.verify_user_password(user_data.email, user_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="メールアドレスまたはパスワードが正しくありません。",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    access_token = create_access_token(
+        data={"sub": user.id, "email": user.email, "name": user.name}
     )
+    
+    return {"access_token": access_token, "token_type": "bearer"}
 
 @router.get("/me", response_model=User)
 async def get_current_user(current_user: User = Depends(get_current_user)):
