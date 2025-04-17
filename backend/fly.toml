@@ -2,10 +2,10 @@ app = "parallel-diary"
 primary_region = "nrt"
 
 [build]
-  dockerfile = "fly/Dockerfile"
+  dockerfile = "Dockerfile"
 
 [http_service]
-  internal_port = 8080
+  internal_port = 8000
   force_https = true
   auto_stop_machines = true
   auto_start_machines = true
@@ -13,8 +13,9 @@ primary_region = "nrt"
   processes = ["app"]
 
 [env]
-  PORT = "8080"
+  PORT = "8000"
   SESSION_SECRET_KEY = "supersecretkey123456789"
+  # PostgreSQL connection will be configured via DATABASE_URL secret
 
 [[vm]]
   cpu_kind = "shared"
