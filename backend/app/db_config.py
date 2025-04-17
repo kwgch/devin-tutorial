@@ -10,12 +10,15 @@ load_dotenv()
 
 is_fly_deployment = os.getenv("FLY_APP_NAME") is not None
 
-if is_fly_deployment:
-    DATABASE_URL = "sqlite:///:memory:"
-    print("Using in-memory SQLite database for deployment", file=sys.stderr)
-else:
-    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost/parallel_diary")
-    print(f"Using database: {DATABASE_URL}", file=sys.stderr)
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL is None:
+    if is_fly_deployment:
+        DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@parallel-diary-db.internal:5432/parallel_diary")
+        print(f"Using PostgreSQL for Fly.io deployment: {DATABASE_URL}", file=sys.stderr)
+    else:
+        DATABASE_URL = "postgresql://postgres:postgres@localhost/parallel_diary"
+        print(f"Using local database: {DATABASE_URL}", file=sys.stderr)
 
 connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 engine = create_engine(DATABASE_URL, connect_args=connect_args)
