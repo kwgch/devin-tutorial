@@ -1,4 +1,3 @@
-import React from 'react';
 import { FavoriteExpression } from '../types';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
