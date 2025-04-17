@@ -31,6 +31,7 @@ export function DiaryApp() {
 
   const handleEntryCreated = () => {
     setRefreshTrigger(prev => prev + 1);
+    setCurrentView('entries');
   };
 
   const handleExpressionAdded = () => {
